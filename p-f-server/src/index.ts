@@ -1,39 +1,52 @@
-import Fastify, { FastifyInstance } from "fastify";
+import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fastifyEnv from "@fastify/env";
 import multipart from "@fastify/multipart";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
-import fjwt, { FastifyJWT } from "@fastify/jwt";
+import fjwt from "@fastify/jwt";
 import { config } from "./config/config";
 import router from "./routes";
 import { swaggerOptions, swaggerUiOptions } from "./config/swaggerOptions";
 import { userSchemas } from "./interfaces/auth/auth.shema";
 import dotenv from "dotenv";
+import { handelCORS } from "./utils";
+// import cookie, { FastifyCookieOptions } from '@fastify/cookie';
+// import fastifyCors from '@fastify/cors';
 
-const fastify: FastifyInstance = Fastify({
+export const fastify: FastifyInstance = Fastify({
   logger: true,
 });
 
-fastify.register(fastifySwagger, swaggerOptions);
-fastify.register(fastifySwaggerUi, swaggerUiOptions);
-
-fastify.addHook("preHandler", (req, res, done) => {
-  const allowedPaths = ["/some", "/list", "/of", "/api", "/paths"];
-  if (allowedPaths.includes(req.routerPath)) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST");
-    res.header("Access-Control-Allow-Headers", "*");
-  }
-
-  const isPreflight = /options/i.test(req.method);
-  if (isPreflight) {
-    return res.send();
-  }
-
-  done();
+fastify.register(fjwt, {
+  secret: "supersecret"
 });
 
-fastify.register(multipart, { attachFieldsToBody: true });
+// fastify.register(fastifySwagger, swaggerOptions);
+// fastify.register(fastifySwaggerUi, swaggerUiOptions);
+
+// fastify.register(cookie, {
+//   secret: "my-secret", // for cookies signature
+//   parseOptions: {}     // options for parsing cookies
+// } as FastifyCookieOptions)
+
+fastify.addHook("preHandler", (req, res, done) => {
+    // console.log('preHandler',req);
+   handelCORS(req,res);
+   done();
+});
+
+fastify.decorate(
+  "authenticate",
+  async function (req: FastifyRequest, reply: FastifyReply) {
+    try {
+      await req.jwtVerify();
+    } catch (err) {
+      return reply.send(err);
+    }
+  }
+);
+
+fastify.register(multipart, { attachFieldsToBody: true })
 
 const schema = {
   type: "object",
