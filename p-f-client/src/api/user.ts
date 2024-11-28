@@ -21,7 +21,6 @@ export const userApi = createApi({
 
     getUser: builder.query({
       query: (params) => {
-        console.log('Id', params);
         if (!params?.id) {
             throw new Error('Missing required parameter: id');
           }
