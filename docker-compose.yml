@@ -37,7 +37,7 @@ services:
       - next-node
 
   postgres:
-    image: postgres
+    image: postgres:12-bullseye
     restart: always
     ports:
       - "5432:5432"
@@ -45,6 +45,12 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=prisma
+    deploy:
+      resources:
+        limits:
+          memory: 256M  # Adjust as needed
+        reservations:
+          memory: 256M # Adjust as needed
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:

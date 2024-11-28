@@ -1,5 +1,5 @@
 import { RouteShorthandOptions } from "fastify";
-import { $ref } from "./auth.shema";
+import { $ref } from "./auth.schema";
 
 
 export const authOptsRegister: RouteShorthandOptions = {
@@ -16,6 +16,7 @@ export const authOptsRegister: RouteShorthandOptions = {
             }},
     }
 };
+
 export const authOptsLogin: RouteShorthandOptions = {
     schema:{
         body: $ref('loginSchema'),
@@ -30,6 +31,7 @@ export const authOptsLogin: RouteShorthandOptions = {
             }},
     }
 };
+
 export const authOpts: RouteShorthandOptions = {
     schema:{
         response: {

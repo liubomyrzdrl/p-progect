@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import AuthService from "../services/authService";
 import argon2 from "argon2";
-import { ICreateUserInput } from "../interfaces/auth/types.auth";
-import { LoginUserInput } from "../interfaces/auth/auth.shema";
+import { IUser } from "../interfaces/auth/types.auth";
+import { LoginUserInput } from "../interfaces/auth/auth.schema";
 import { fastify } from "../index";
 
 class AuthController {
@@ -18,7 +18,7 @@ class AuthController {
 
   async authRegister(
     req: FastifyRequest<{
-      Body: ICreateUserInput;
+      Body: IUser;
     }>,
     reply: FastifyReply
   ): Promise<void> {
@@ -55,10 +55,9 @@ class AuthController {
     }>,
     reply: FastifyReply
   ) {
-    console.log('Auth authLogin');
     const { email, password } = req.body;
     const existedUser = await AuthService.getUserByEmail(email);
-    console.log("Login", existedUser);
+
     const token =
       existedUser?.username &&
       fastify.jwt.sign({

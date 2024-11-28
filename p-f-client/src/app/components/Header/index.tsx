@@ -1,25 +1,16 @@
-import React from 'react';
+import React from "react";
 
-import Link from 'next/link'
-import Button from '@mui/material/Button';
+import Link from 'next/link';
 
-const MainHeader = () => {
-    return (
-        <header className="flex justify-between items-center align-middle w-full bg-blue-500 px-7 py-5">
-          <div className="text-white rounded-full">
-             Logo
-          </div>
-           <div className="flex">
-               <Link href={'auth/login'}>
-                <Button variant="outlined" className="text-white border-white rounded-[5px] mr-[7px]">Login</Button>
-             </Link>
-             <Link href={'auth/register'}>
-               <Button variant="outlined"  className="text-white border-white rounded-[5px]">Register</Button>
-             </Link>
-           </div>
-          
-        </header>
-    );
+const Header = ({ children }: { children ?: React.ReactNode }) => {
+  return (
+    <header className="flex justify-between items-center align-middle w-full h-[90px] bg-blue-500 px-9 ">
+        <Link href="/">
+          <div className="text-white rounded-full">Logo</div>
+        </Link>
+      {children}
+    </header>
+  );
 };
 
-export default MainHeader;
+export default Header;

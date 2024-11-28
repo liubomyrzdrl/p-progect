@@ -40,9 +40,9 @@ const loginResponseSchema = z.object({
   token: z.string(),
 });
 
-export const { schemas: userSchemas, $ref } = buildJsonSchemas({
+export const { schemas: authSchemas, $ref } = buildJsonSchemas({
   createUserSchema,
   createUserResponseSchema,
   loginSchema,
   loginResponseSchema,
-});
+},   { $id: "AuthSchemas" } );

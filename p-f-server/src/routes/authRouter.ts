@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import AuthController from "../../controllers/auth.controller";
-import { authOpts, authOptsRegister, authOptsLogin  } from "../../interfaces/auth/auth.opts";
+import AuthController from "../controllers/auth.controller";
+import { authOpts, authOptsRegister, authOptsLogin  } from "../interfaces/auth/auth.opts";
 
 const router = async (fastify: FastifyInstance) => {
   /**

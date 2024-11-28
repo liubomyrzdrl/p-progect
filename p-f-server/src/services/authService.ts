@@ -1,5 +1,5 @@
 import { DB } from "../config/dbConfig";
-import { ICreateUserInput } from "../interfaces/auth/types.auth";
+import { IUser } from "../interfaces/auth/types.auth";
 
 class AuthService {
   async createUser(username: string, email: string, password: string) {
@@ -23,7 +23,7 @@ class AuthService {
     }
   }
 
-  async getUserByEmail(email: string): Promise<ICreateUserInput | null >  {
+  async getUserByEmail(email: string): Promise<IUser | null>  {
     try {
       const user = await DB.user.findUnique({
         where: {
@@ -36,6 +36,21 @@ class AuthService {
       throw new Error(err);
     }
   }
+  async getUserById(id: string): Promise<IUser | null>  {
+    try {
+      const user = await DB.user.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      return user;
+    } catch (err: any) {
+      throw new Error(err);
+    }
+  }
+
+
 }
 
 export default new AuthService();

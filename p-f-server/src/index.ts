@@ -4,14 +4,14 @@ import multipart from "@fastify/multipart";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import fjwt from "@fastify/jwt";
-import { config } from "./config/config";
+
 import router from "./routes";
-import { swaggerOptions, swaggerUiOptions } from "./config/swaggerOptions";
-import { userSchemas } from "./interfaces/auth/auth.shema";
+
 import dotenv from "dotenv";
-import { handelCORS } from "./utils";
+import { authenticateDecorator, registerCORS } from "./utils";
+import { authSchemas } from "./interfaces/auth/auth.schema";
+import { userSchemas } from "./interfaces/users/user.schema";
 // import cookie, { FastifyCookieOptions } from '@fastify/cookie';
-// import fastifyCors from '@fastify/cors';
 
 export const fastify: FastifyInstance = Fastify({
   logger: true,
@@ -29,22 +29,14 @@ fastify.register(fjwt, {
 //   parseOptions: {}     // options for parsing cookies
 // } as FastifyCookieOptions)
 
-fastify.addHook("preHandler", (req, res, done) => {
-    // console.log('preHandler',req);
-   handelCORS(req,res);
-   done();
-});
+// fastify.addHook("preHandler", (req, res, done) => {
+//     // console.log('preHandler',req);
+//    handelCORS(req,res);
+//    done();
+// });
 
-fastify.decorate(
-  "authenticate",
-  async function (req: FastifyRequest, reply: FastifyReply) {
-    try {
-      await req.jwtVerify();
-    } catch (err) {
-      return reply.send(err);
-    }
-  }
-);
+registerCORS(fastify);
+authenticateDecorator(fastify);
 
 fastify.register(multipart, { attachFieldsToBody: true })
 
@@ -68,11 +60,7 @@ const options = {
 
 dotenv.config();
 
-fastify.get("/", async (request, response) => {
-  return `<h1>Server Fastify</h1>`;
-});
-
-for (let schema of [...userSchemas]) {
+for (let schema of [...userSchemas, ...authSchemas]) {
   fastify.addSchema(schema);
 }
 
