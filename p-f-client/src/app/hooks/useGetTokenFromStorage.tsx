@@ -5,27 +5,24 @@ import { setAuthStateAction } from "@/store/features/authSlice";
 import { decodeToken } from "@/utils/decodeToken";
 import { setUserAction } from "@/store/features/userSlice";
 
-export const useGetTokenFromStorage = async () => {
-    const [token, setToken] = useState<string | null>(null);
-
-    const decodedToken = decodeToken(token);
-
-    const { data } = useGetUserQuery(
-      { id: decodedToken?.id.id },
-      { skip: !token }
-    );
+export const useGetTokenFromStorage = () => {
+  const [token, setToken] = useState<string | null>(null);
 
 
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    useEffect(() => {
+  useEffect(() => {
+    const fetchToken = async () => {
       const storedToken = localStorage.getItem("token");
-      if(!storedToken)  return;
-      if(data) dispatch(setUserAction(data));
-
-      dispatch(setAuthStateAction(true));
       setToken(storedToken);
-    }, [data, dispatch]);
-  
-    return token;
-  };
+
+      if (storedToken) {
+        const decoded = decodeToken(storedToken);
+        dispatch(setAuthStateAction(true));
+        dispatch(setUserAction(decoded?.id));
+      }
+    };
+
+    fetchToken();
+  }, [ dispatch]);
+};

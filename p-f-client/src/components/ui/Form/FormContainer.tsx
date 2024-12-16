@@ -1,18 +1,19 @@
 import React from "react";
 
 import { FormProvider, UseFormReturn } from "react-hook-form";
+import { Form } from "./form";
 
 interface IForm {
     children: React.ReactNode;
     form: UseFormReturn<any>;
     onSubmit: (values: any) => void;
 }
-const Form = ({ children, form, onSubmit }: IForm) => {
+const FormContainer = ({ children, form, onSubmit }: IForm) => {
   return (
-    <FormProvider {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>{children}</form>
-    </FormProvider>
+    </Form>
   );
 };
 
-export default Form;
+export default FormContainer;

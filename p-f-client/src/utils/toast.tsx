@@ -9,12 +9,12 @@ const DEFAULT_TOAST_SETTINGS = {
   pauseOnHover: true,
   draggable: true,
   theme: 'colored' as const,
-  className: 'rounded-lg bg-green-500 height-[50px] w-[150px]', 
+  className: 'rounded-lg bg-green-500', 
 };
 
 const Body = ({ message }: { message: string }) => {
   return (
-    <div className="bg-slate-700">
+    <div className="bg-slate-700 ">
       <p>{message}</p>
     </div>
   );

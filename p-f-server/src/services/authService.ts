@@ -9,7 +9,7 @@ class AuthService {
       });
       return user;
     } catch (error: any) {
-        throw new Error(error)
+      throw new Error(error);
     }
   }
 
@@ -23,20 +23,19 @@ class AuthService {
     }
   }
 
-  async getUserByEmail(email: string): Promise<IUser | null>  {
+  async getUserByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await DB.user.findUnique({
         where: {
           email,
         },
       });
-
       return user;
     } catch (err: any) {
-      throw new Error(err);
+      throw new Error("User not found");
     }
   }
-  async getUserById(id: string): Promise<IUser | null>  {
+  async getUserById(id: string): Promise<IUser | null> {
     try {
       const user = await DB.user.findUnique({
         where: {
@@ -46,11 +45,10 @@ class AuthService {
 
       return user;
     } catch (err: any) {
-      throw new Error(err);
+      console.log("Login error", err);
+      throw new Error("User nt found");
     }
   }
-
-
 }
 
 export default new AuthService();

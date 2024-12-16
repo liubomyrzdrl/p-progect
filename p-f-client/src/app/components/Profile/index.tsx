@@ -16,7 +16,7 @@ const Profile = () => {
   const user = useSelector<RootStoreType, IUser | null>(
     (store) => store.userReducer.user
   );
-
+  
   if (!user) {
     return (
       <Oval

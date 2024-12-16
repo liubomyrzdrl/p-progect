@@ -30,7 +30,7 @@ class AuthController {
         message: "User already exists with this email",
       });
     }
-
+    
     const hashedPassword = await argon2.hash(password);
     try {
       const newUser = await AuthService.createUser(
@@ -58,19 +58,26 @@ class AuthController {
     const { email, password } = req.body;
     const existedUser = await AuthService.getUserByEmail(email);
 
+    if (!existedUser) {
+      return reply.code(401).send({
+        message: "User not found",
+      });
+    }
+
     const token =
       existedUser?.username &&
       fastify.jwt.sign({
         id: existedUser,
         username: existedUser?.username,
       });
+
     const isValidPassword = await argon2.verify(
       existedUser?.password as string,
       password
     );
 
 
-    if (!existedUser || !isValidPassword) {
+    if (!isValidPassword) {
       return reply.code(401).send({
         message: "Invalid email or password",
       });
