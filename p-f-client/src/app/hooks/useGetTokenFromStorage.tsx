@@ -24,5 +24,5 @@ export const useGetTokenFromStorage = () => {
     };
 
     fetchToken();
-  }, [ dispatch]);
+  }, [dispatch]);
 };

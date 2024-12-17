@@ -5,25 +5,19 @@ import React from "react";
 import { Button } from "@/components/ui/Button";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import InputFromField from "@/components/ui/Form/InputFormField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthLoginMutation } from "@/api/auth";
 import { showTost } from "@/utils/toast";
-import { ToastEnum } from "@/constants/enums";
+import { Auth, ToastEnum } from "@/constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { setAuthStateAction } from "@/store/features/authSlice";
 import { setUserAction } from "@/store/features/userSlice";
 import { useIsAuthProtectRoute } from "@/app/hooks/useIsAuthProtectRoute";
 import FormContainer from "@/components/ui/Form/FormContainer";
-
-const ariaLabel = { "aria-label": "description" };
-
-interface IFormLogin {
-  email: string;
-  password: string;
-}
+import AuthInputFormField from "../components/AuthInputFormField";
+import { handleResponseError } from "@/lib/handleResponseError";
 
 const loginSchema = z.object({
   email: z
@@ -62,22 +56,8 @@ const Login = () => {
         localStorage.setItem("token", JSON.stringify(response.data.token));
         router.push("/");
       }
-      
-      if (response.error && "data" in response.error) {
-        const errorData = response.error.data;
-        if (
-          errorData &&
-          typeof errorData === "object" &&
-          "message" in errorData
-        ) {
-          showTost(
-            ToastEnum.ERROR,
-            `Login error - ${(errorData as { message: string }).message}`
-          );
-        } else {
-          showTost(ToastEnum.ERROR, "Login error - Unknown error");
-        }
-      }
+      handleResponseError(response, "Login error");
+
     } catch (error) {
       console.log("handleSubmit error", error);
       showTost(ToastEnum.ERROR, `Login error -${error} `);
@@ -87,22 +67,23 @@ const Login = () => {
 
   return (
     <div className="w-[400px] border-solid border-1 border-slate-400  shadow-lg bg-white p-10 text-center">
-      <div className="text-dimgrey text-[28px] ">Login</div>
+      <div className="text-dimgrey text-[28px]">{Auth.LOGIN}</div>
       <FormContainer form={form} onSubmit={handleSubmit}>
-        <div className="h-[60px]">
-          <InputFromField name="email" form={form} placeholder="Email" />
-        </div>
-        <div className="h-[60px]">
-          <InputFromField name="password" form={form} placeholder="Password" />
-        </div>
+        <AuthInputFormField name="email" form={form} placeholder="Email" />
+        <AuthInputFormField
+          name="password"
+          form={form}
+          placeholder={Auth.PASSWORD}
+        />
+
         <Button type="submit" className="mt-4 text-white">
-          Login
+          {Auth.LOGIN}
         </Button>
       </FormContainer>
       <div className="mt-[30px] text-dimgrey">
         Do you have an account?{" "}
         <span className="text-blue-500 ">
-          <Link href={"/auth/register"}> Register</Link>
+          <Link href={"/auth/register"}> {Auth.REGISTER}</Link>
         </span>
       </div>
     </div>

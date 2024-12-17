@@ -4,3 +4,10 @@ export enum ToastEnum {
     INFO = 'info',
     WARNING = 'warning'
 }
+
+export enum Auth {
+    LOGIN = 'Login',
+    REGISTER = 'Register',
+    PASSWORD = 'Password',
+    CONFIRM_PASSWORD = 'Confirm Password'
+}

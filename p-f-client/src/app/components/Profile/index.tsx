@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 
 import { RootStoreType } from "@/store/store";
 import { IUser } from "@/types/user";
@@ -16,7 +17,25 @@ const Profile = () => {
   const user = useSelector<RootStoreType, IUser | null>(
     (store) => store.userReducer.user
   );
-  
+
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsExpandMoreProfileBlock(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   if (!user) {
     return (
       <Oval
@@ -32,8 +51,8 @@ const Profile = () => {
   }
 
   return (
-    <div>
-      <div className="flex">
+    <div ref={profileRef}>
+      <div className="flex z-10">
         <div className="rounded-full h-[50px] w-[50px] bg-white text-slate-500 flex justify-center items-center">
           {user?.username.split("")[0].toUpperCase() || ""}
         </div>
@@ -56,7 +75,7 @@ const Profile = () => {
         )}
       </div>
       {isExpandMoreProfileBlock && (
-        <div className="absolute top-[80px] right-[30px] bg-white rounded-lg w-[150px] px-6 py-6">
+        <div className="absolute top-[80px] right-[30px] bg-slate-100 rounded-lg w-[150px] px-6 py-6 shadow-sm">
           <div className="cursor-pointer">Profile</div>
           <div
             className="cursor-pointer"

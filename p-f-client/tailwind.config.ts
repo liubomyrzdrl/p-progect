@@ -33,6 +33,7 @@ const config: Config = {
 			  silver: {
 				DEFAULT: "#C0C0C0"
 			  },
+			  gainsboro: "#DCDCDC",
 			  grey: {
 				DEFAULT: "#808080"
 			  },

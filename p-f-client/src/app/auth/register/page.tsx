@@ -3,27 +3,20 @@ import React from "react";
 
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-
-import InputFromField from "@/components/ui/Form/InputFormField";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showTost } from "@/utils/toast";
 import { useAuthRegisterMutation } from "@/api/auth";
 import { useDispatch } from "react-redux";
-import { ToastEnum } from "@/constants/enums";
+import { Auth, ToastEnum } from "@/constants/enums";
 import { useRouter } from "next/navigation";
 import { setAuthStateAction } from "@/store/features/authSlice";
-import { setUserAction } from "@/store/features/userSlice"; 
+import { setUserAction } from "@/store/features/userSlice";
 import { useIsAuthProtectRoute } from "@/app/hooks/useIsAuthProtectRoute";
 import { Button } from "@/components/ui/Button";
 import FormContainer from "@/components/ui/Form/FormContainer";
-
-interface IFormRegister {
-  username: string;
-  email: string;
-  password: string;
-  confirm_password: string;
-}
+import AuthInputFormField from "../components/AuthInputFormField";
+import { handleResponseError } from "@/lib/handleResponseError";
 
 const registerSchema = z.object({
   username: z.string(),
@@ -37,7 +30,8 @@ const registerSchema = z.object({
   confirm_password: z.string().min(6),
 });
 
-const REGISTER = "Register";
+type RegisterSchemaType = z.infer<typeof registerSchema>;
+
 const Register = () => {
   const [registerUser] = useAuthRegisterMutation();
   const dispatch = useDispatch();
@@ -53,7 +47,7 @@ const Register = () => {
       confirm_password: "",
     },
   });
-  const handleSubmit = async (data: IFormRegister) => {
+  const handleSubmit = async (data: RegisterSchemaType) => {
     try {
       const response = await registerUser(data);
 
@@ -65,53 +59,37 @@ const Register = () => {
         localStorage.setItem("token", JSON.stringify(response.data.token));
         router.push("/");
       }
-
-      if (response.error && "data" in response.error) {
-        const errorData = response.error.data;
-        if (
-          errorData &&
-          typeof errorData === "object" &&
-          "message" in errorData
-        ) {
-          showTost(
-            ToastEnum.ERROR,
-            `Login error - ${(errorData as { message: string }).message}`
-          );
-        } else {
-          showTost(ToastEnum.ERROR, "Login error - Unknown error");
-        }
-      }
+      handleResponseError(response, "Register error");
     } catch (error) {
-      showTost(ToastEnum.ERROR, `Login error -${error} `);
+      showTost(ToastEnum.ERROR, `Register error -${error} `);
       console.error(error);
     }
   };
 
   return (
     <div className="w-[400px] border-solid border-1 border-slate-400 shadow-lg bg-white p-10 text-center">
-      <div className="text-dimgrey text-[28px]">{REGISTER}</div>
+      <div className="text-dimgrey text-[28px]">{Auth.REGISTER}</div>
       <FormContainer form={form} onSubmit={handleSubmit}>
-        <div className="h-[60px]">
-          <InputFromField name="username" form={form} placeholder="Username" />
-        </div>
-        <div className="h-[60px]">
-          <InputFromField name="email" form={form} placeholder="Email" />
-        </div>
-        <div className="h-[60px]">
-          <InputFromField name="password" form={form} placeholder="Password" />
-        </div>
-        <div className="h-[60px]">
-          <InputFromField name="confirm_password" form={form} placeholder="Confirm Password" />
-        </div>
+        <AuthInputFormField name="email" form={form} placeholder="Email" />
+        <AuthInputFormField
+          name="password"
+          form={form}
+          placeholder={Auth.PASSWORD}
+        />
+        <AuthInputFormField
+          name="confirm_password"
+          form={form}
+          placeholder={Auth.CONFIRM_PASSWORD}
+        />
         <Button type="submit" className="mt-4 text-white">
-          Register
+          {Auth.REGISTER}
         </Button>
       </FormContainer>
       <div className="mt-[30px] text-dimgrey">
         Already have an account?{" "}
         <span className="text-blue-500">
           {" "}
-          <Link href={"/auth/login"}>Login</Link>
+          <Link href={"/auth/login"}>{Auth.LOGIN}</Link>
         </span>
       </div>
     </div>

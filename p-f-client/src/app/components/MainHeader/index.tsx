@@ -11,10 +11,7 @@ import { IUser } from "@/types/user";
 import Header from "../Header";
 import Profile from "../Profile";
 
-const AuthHeader = () => {
-  const user = useSelector<RootStoreType, IUser | null>(
-    (store) => store.userReducer.user
-  );
+const MainHeader = () => {
   const isAuth = useSelector<RootStoreType>(
     (store) => store.authReducer.isAuth
   );
@@ -41,4 +38,4 @@ const AuthHeader = () => {
   );
 };
 
-export default AuthHeader;
+export default MainHeader;
