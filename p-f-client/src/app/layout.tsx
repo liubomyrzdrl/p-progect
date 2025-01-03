@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,10 +37,14 @@ export default function RootLayout({
         />
       </Head>
       <body className={inter.className} suppressHydrationWarning>
-        <ReduxProvider>
-          <ToastContainer autoClose={3000} />
-          {children}
-        </ReduxProvider>
+        <GoogleOAuthProvider
+          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+        >
+          <ReduxProvider>
+            <ToastContainer autoClose={3000} />
+            {children}
+          </ReduxProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

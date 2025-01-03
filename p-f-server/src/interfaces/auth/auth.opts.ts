@@ -17,9 +17,38 @@ export const authOptsRegister: RouteShorthandOptions = {
     }
 };
 
+export const authGoogleOptsRegister: RouteShorthandOptions = {
+    schema:{
+        body: $ref('createGoogleUserSchema'),
+        response: { 
+            200: $ref('createUserResponseSchema'),
+            404: {
+                type: 'object',
+                properties: {
+                    statusCode: { type: 'integer' },
+                    message: { type: 'string' },
+                },
+            }},
+    }
+};
+
 export const authOptsLogin: RouteShorthandOptions = {
     schema:{
         body: $ref('loginSchema'),
+        response: { 
+            200: $ref('loginResponseSchema'),
+            404: {
+                type: 'object',
+                properties: {
+                    statusCode: { type: 'integer' },
+                    message: { type: 'string' },
+                },
+            }},
+    }
+};
+export const authGoogleOptsLogin: RouteShorthandOptions = {
+    schema:{
+        body: $ref('loginGoogleSchema'),
         response: { 
             200: $ref('loginResponseSchema'),
             404: {

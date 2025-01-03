@@ -7,17 +7,19 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuthLoginMutation } from "@/api/auth";
+import { useAuthGoogleLoginMutation, useAuthLoginMutation } from "@/api/auth";
 import { showTost } from "@/utils/toast";
 import { Auth, ToastEnum } from "@/constants/enums";
 import { useDispatch, useSelector } from "react-redux";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 import { setAuthStateAction } from "@/store/features/authSlice";
 import { setUserAction } from "@/store/features/userSlice";
 import { useIsAuthProtectRoute } from "@/app/hooks/useIsAuthProtectRoute";
 import FormContainer from "@/components/ui/Form/FormContainer";
 import AuthInputFormField from "../components/AuthInputFormField";
-import { handleResponseError } from "@/lib/handleResponseError";
+import Image from "next/image";
+import { getGoogleAccountInfo, setAuthDataToState } from "../utils";
 
 const loginSchema = z.object({
   email: z
@@ -32,6 +34,7 @@ const loginSchema = z.object({
 type LoginSchemaType = z.infer<typeof loginSchema>;
 const Login = () => {
   const [loginUser] = useAuthLoginMutation();
+  const [googleLoginUser] = useAuthGoogleLoginMutation();
   const dispatch = useDispatch();
   const router = useRouter();
   useIsAuthProtectRoute();
@@ -47,23 +50,41 @@ const Login = () => {
   const handleSubmit = async (data: LoginSchemaType) => {
     try {
       const response = await loginUser(data);
-      if (response.data) {
-        showTost(ToastEnum.SUCCESS, "Login successful");
 
-        dispatch(setAuthStateAction(true));
-        dispatch(setUserAction(response.data.user));
-
-        localStorage.setItem("token", JSON.stringify(response.data.token));
-        router.push("/");
-      }
-      handleResponseError(response, "Login error");
-
+      setAuthDataToState(
+        response,
+        "Login success",
+        "Login error",
+        router,
+        dispatch
+      );
     } catch (error) {
-      console.log("handleSubmit error", error);
       showTost(ToastEnum.ERROR, `Login error -${error} `);
-      console.error(error);
     }
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const userInfo = await getGoogleAccountInfo(response);
+
+        const responseGoogleLogin = await googleLoginUser({
+          email: userInfo.email,
+        });
+
+        setAuthDataToState(
+          responseGoogleLogin,
+          "Google Login successful",
+          "Google Login error",
+          router,
+          dispatch
+        );
+      } catch (error) {
+        showTost(ToastEnum.ERROR, `Login error -${error} `);
+      }
+    },
+    onError: () => showTost(ToastEnum.ERROR, "Google login failed"),
+  });
 
   return (
     <div className="w-[400px] border-solid border-1 border-slate-400  shadow-lg bg-white p-10 text-center">
@@ -76,6 +97,13 @@ const Login = () => {
           placeholder={Auth.PASSWORD}
         />
 
+        <div
+          className="flex items-center border-solid border-[1px] border-slate-200 rounded-sm px-3 py-3 cursor-pointer"
+          onClick={() => handleGoogleLogin()}
+        >
+          <Image src="/google_img.png" width={20} height={20} alt="google" />
+          <span className="ml-2 text-dimgrey">Continue with Google</span>
+        </div>
         <Button type="submit" className="mt-4 text-white">
           {Auth.LOGIN}
         </Button>

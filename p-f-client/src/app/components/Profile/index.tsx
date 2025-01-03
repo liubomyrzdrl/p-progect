@@ -52,7 +52,7 @@ const Profile = () => {
 
   return (
     <div ref={profileRef}>
-      <div className="flex z-10">
+      <div className="flex">
         <div className="rounded-full h-[50px] w-[50px] bg-white text-slate-500 flex justify-center items-center">
           {user?.username.split("")[0].toUpperCase() || ""}
         </div>

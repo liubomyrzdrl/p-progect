@@ -6,20 +6,25 @@ import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showTost } from "@/utils/toast";
-import { useAuthRegisterMutation } from "@/api/auth";
+import {
+  useAuthGoogleRegisterMutation,
+  useAuthRegisterMutation,
+} from "@/api/auth";
 import { useDispatch } from "react-redux";
 import { Auth, ToastEnum } from "@/constants/enums";
 import { useRouter } from "next/navigation";
-import { setAuthStateAction } from "@/store/features/authSlice";
-import { setUserAction } from "@/store/features/userSlice";
+import { useGoogleLogin } from "@react-oauth/google";
+
 import { useIsAuthProtectRoute } from "@/app/hooks/useIsAuthProtectRoute";
 import { Button } from "@/components/ui/Button";
 import FormContainer from "@/components/ui/Form/FormContainer";
 import AuthInputFormField from "../components/AuthInputFormField";
-import { handleResponseError } from "@/lib/handleResponseError";
+
+import Image from "next/image";
+import { getGoogleAccountInfo, setAuthDataToState } from "../utils";
 
 const registerSchema = z.object({
-  username: z.string(),
+  username: z.string({ required_error: "User Name is required" }),
   email: z
     .string({
       required_error: "Email is required",
@@ -34,6 +39,8 @@ type RegisterSchemaType = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const [registerUser] = useAuthRegisterMutation();
+  const [googleRegisterUser] = useAuthGoogleRegisterMutation();
+
   const dispatch = useDispatch();
   const router = useRouter();
   useIsAuthProtectRoute();
@@ -47,29 +54,54 @@ const Register = () => {
       confirm_password: "",
     },
   });
+
   const handleSubmit = async (data: RegisterSchemaType) => {
     try {
       const response = await registerUser(data);
 
-      if (response.data) {
-        showTost(ToastEnum.SUCCESS, "Registration  successful");
-        dispatch(setAuthStateAction(true));
-        dispatch(setUserAction(response.data.user));
+      setAuthDataToState(
+        response,
+        "Registration success",
+        "Registration error",
+        router,
+        dispatch
+      );
 
-        localStorage.setItem("token", JSON.stringify(response.data.token));
-        router.push("/");
-      }
-      handleResponseError(response, "Register error");
     } catch (error) {
       showTost(ToastEnum.ERROR, `Register error -${error} `);
       console.error(error);
     }
   };
 
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const userInfo = await getGoogleAccountInfo(response);
+
+        const responseGoogleRegister = await googleRegisterUser({
+          email: userInfo.email,
+          username: userInfo.name,
+        });
+        setAuthDataToState(
+          responseGoogleRegister,
+          "Google Registration successful",
+          "Google Registration error",
+          router,
+          dispatch
+        );
+      } catch (error) {
+        console.error("Google Login Error:", error);
+        alert("Failed to login");
+      }
+    },
+    onError: () => alert("Google login failed"),
+  });
+
   return (
     <div className="w-[400px] border-solid border-1 border-slate-400 shadow-lg bg-white p-10 text-center">
       <div className="text-dimgrey text-[28px]">{Auth.REGISTER}</div>
       <FormContainer form={form} onSubmit={handleSubmit}>
+        <AuthInputFormField name="username" form={form} placeholder="User Name" />
         <AuthInputFormField name="email" form={form} placeholder="Email" />
         <AuthInputFormField
           name="password"
@@ -81,6 +113,13 @@ const Register = () => {
           form={form}
           placeholder={Auth.CONFIRM_PASSWORD}
         />
+        <div
+          className="flex items-center border-solid border-[1px] border-slate-200 rounded-sm px-3 py-3 cursor-pointer"
+          onClick={() => handleGoogleLogin()}
+        >
+          <Image src="/google_img.png" width={20} height={20} alt="google" />
+          <span className="ml-2 text-dimgrey">Continue with Google</span>
+        </div>
         <Button type="submit" className="mt-4 text-white">
           {Auth.REGISTER}
         </Button>

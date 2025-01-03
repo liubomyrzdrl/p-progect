@@ -10,6 +10,7 @@ export const authApi = createApi({
         method: "GET",
       }),
     }),
+
     authLogin: builder.mutation({
       query: (body) => ({
         url: "auth/login",
@@ -17,6 +18,7 @@ export const authApi = createApi({
         body,
       }),
     }),
+
     authRegister: builder.mutation({
       query: (body) => ({
         url: "auth/register",
@@ -24,7 +26,29 @@ export const authApi = createApi({
         body,
       }),
     }),
+
+    authGoogleRegister: builder.mutation({
+      query: (body) => ({
+        url: "auth/google-register",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    authGoogleLogin: builder.mutation({
+      query: (body) => ({
+        url: "auth/google-login",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useAuthLoginMutation, useAuthRegisterMutation, useAuthGetQuery } = authApi;
+export const {
+  useAuthLoginMutation,
+  useAuthRegisterMutation,
+  useAuthGetQuery,
+  useAuthGoogleRegisterMutation,
+  useAuthGoogleLoginMutation,
+} = authApi;

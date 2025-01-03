@@ -2,7 +2,7 @@ import { DB } from "../config/dbConfig";
 import { IUser } from "../interfaces/auth/types.auth";
 
 class AuthService {
-  async createUser(username: string, email: string, password: string) {
+  async createUser(username: string, email: string, password: string = 'password') {
     try {
       const user = await DB.user.create({
         data: { username, email, password },

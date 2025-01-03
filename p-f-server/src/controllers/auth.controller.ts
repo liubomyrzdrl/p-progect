@@ -30,7 +30,7 @@ class AuthController {
         message: "User already exists with this email",
       });
     }
-    
+
     const hashedPassword = await argon2.hash(password);
     try {
       const newUser = await AuthService.createUser(
@@ -39,7 +39,37 @@ class AuthController {
         hashedPassword
       );
       const token = fastify.jwt.sign({
-        id: newUser.id,
+        id: newUser,
+        username,
+      });
+
+      reply.code(200).send({ user: newUser, token });
+    } catch (err) {
+      return reply.code(500).send(err);
+    }
+  }
+  async authGoogleRegister(
+    req: FastifyRequest<{
+      Body: IUser;
+    }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { username, email } = req.body;
+    const existedUser = await AuthService.getUserByEmail(email);
+
+    if (existedUser) {
+      return reply.code(401).send({
+        message: "User already exists with this email",
+      });
+    }
+
+    try {
+      const newUser = await AuthService.createUser(
+        username,
+        email
+      );
+      const token = fastify.jwt.sign({
+        id: newUser,
         username,
       });
 
@@ -76,12 +106,38 @@ class AuthController {
       password
     );
 
-
     if (!isValidPassword) {
       return reply.code(401).send({
         message: "Invalid email or password",
       });
     }
+
+    reply.code(200).send({
+      user: existedUser,
+      token,
+    });
+  }
+  async authGoogleLogin(
+    req: FastifyRequest<{
+      Body: LoginUserInput;
+    }>,
+    reply: FastifyReply
+  ) {
+    const { email } = req.body;
+    const existedUser = await AuthService.getUserByEmail(email);
+
+    if (!existedUser) {
+      return reply.code(401).send({
+        message: "User not found",
+      });
+    }
+
+    const token =
+      existedUser?.username &&
+      fastify.jwt.sign({
+        id: existedUser,
+        username: existedUser?.username,
+      });
 
     reply.code(200).send({
       user: existedUser,

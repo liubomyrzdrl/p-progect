@@ -18,7 +18,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="w-full h-full">
           <Header />
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            {children}
+            {children}      
           </div>
         </div>
       </div>

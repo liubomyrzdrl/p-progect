@@ -19,6 +19,13 @@ const createUserResponseSchema = z.object({
   token: z.string(),
 });
 
+const createGoogleUserSchema = z.object({
+  username: z.string(),
+  email: z.string(),
+});
+
+export type CreateGoogleUserInput = z.infer<typeof createUserSchema>;
+
 const loginSchema = z.object({
   email: z
     .string({
@@ -31,6 +38,17 @@ const loginSchema = z.object({
 
 export type LoginUserInput = z.infer<typeof loginSchema>;
 
+const loginGoogleSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
+    .email(),
+});
+
+export type LoginGoogleUserInput = z.infer<typeof loginSchema>;
+
 const loginResponseSchema = z.object({
   user: z.object({
     id: z.string(),
@@ -42,7 +60,9 @@ const loginResponseSchema = z.object({
 
 export const { schemas: authSchemas, $ref } = buildJsonSchemas({
   createUserSchema,
+  createGoogleUserSchema,
   createUserResponseSchema,
   loginSchema,
   loginResponseSchema,
+  loginGoogleSchema,
 },   { $id: "AuthSchemas" } );
