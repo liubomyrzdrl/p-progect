@@ -7,7 +7,7 @@ export enum ToastEnum {
 
 export enum Auth {
     LOGIN = 'Login',
-    REGISTER = 'Register',
+    SIGNUP = 'Signup',
     PASSWORD = 'Password',
     CONFIRM_PASSWORD = 'Confirm Password'
 }

@@ -10,16 +10,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthGoogleLoginMutation, useAuthLoginMutation } from "@/api/auth";
 import { showTost } from "@/utils/toast";
 import { Auth, ToastEnum } from "@/constants/enums";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
-import { setAuthStateAction } from "@/store/features/authSlice";
-import { setUserAction } from "@/store/features/userSlice";
 import { useIsAuthProtectRoute } from "@/app/hooks/useIsAuthProtectRoute";
 import FormContainer from "@/components/ui/Form/FormContainer";
+
 import AuthInputFormField from "../components/AuthInputFormField";
-import Image from "next/image";
 import { getGoogleAccountInfo, setAuthDataToState } from "../utils";
+import ContinueWithGoogleButton from "../components/ContinueWithGoogleButton";
+import OrDelimiter from "../components/OrDelimiter";
 
 const loginSchema = z.object({
   email: z
@@ -28,7 +28,9 @@ const loginSchema = z.object({
       invalid_type_error: "Email must be a string",
     })
     .email(),
-  password: z.string().min(6),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
 });
 
 type LoginSchemaType = z.infer<typeof loginSchema>;
@@ -68,10 +70,12 @@ const Login = () => {
       try {
         const userInfo = await getGoogleAccountInfo(response);
 
+        console.log("userInfo", userInfo);
         const responseGoogleLogin = await googleLoginUser({
           email: userInfo.email,
         });
 
+        console.log("responseGoogleLogin", responseGoogleLogin);
         setAuthDataToState(
           responseGoogleLogin,
           "Google Login successful",
@@ -87,7 +91,7 @@ const Login = () => {
   });
 
   return (
-    <div className="w-[400px] border-solid border-1 border-slate-400  shadow-lg bg-white p-10 text-center">
+    <div className="w-[400px] border-solid border-1 border-slate-400 rounded-sm shadow-lg bg-white p-10 text-center">
       <div className="text-dimgrey text-[28px]">{Auth.LOGIN}</div>
       <FormContainer form={form} onSubmit={handleSubmit}>
         <AuthInputFormField name="email" form={form} placeholder="Email" />
@@ -96,24 +100,18 @@ const Login = () => {
           form={form}
           placeholder={Auth.PASSWORD}
         />
-
-        <div
-          className="flex items-center border-solid border-[1px] border-slate-200 rounded-sm px-3 py-3 cursor-pointer"
-          onClick={() => handleGoogleLogin()}
-        >
-          <Image src="/google_img.png" width={20} height={20} alt="google" />
-          <span className="ml-2 text-dimgrey">Continue with Google</span>
-        </div>
-        <Button type="submit" className="mt-4 text-white">
+        <Button type="submit" className="mt-2 text-white w-full">
           {Auth.LOGIN}
         </Button>
       </FormContainer>
-      <div className="mt-[30px] text-dimgrey">
+      <div className="mt-[10px] text-dimgrey">
         Do you have an account?{" "}
         <span className="text-blue-500 ">
-          <Link href={"/auth/register"}> {Auth.REGISTER}</Link>
+          <Link href={"/auth/signup"}> {Auth.SIGNUP}</Link>
         </span>
       </div>
+      <OrDelimiter />
+      <ContinueWithGoogleButton onHandleGoogle={handleGoogleLogin} />
     </div>
   );
 };

@@ -5,8 +5,6 @@ import { RootStoreType } from "@/store/store";
 import { IUser } from "@/types/user";
 import { useDispatch, useSelector } from "react-redux";
 import { Oval } from "react-loader-spinner";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { authLogoutAction } from "@/store/features/authSlice";
 
 const Profile = () => {
@@ -51,34 +49,27 @@ const Profile = () => {
   }
 
   return (
-    <div ref={profileRef}>
+    <div
+      ref={profileRef}
+      onClick={(event) => {
+        if (
+          event.target &&
+          (event.target as HTMLElement).classList.contains("profile-container")
+        ) {
+          return;
+        }
+        setIsExpandMoreProfileBlock(!isExpandMoreProfileBlock);
+      }}
+    >
       <div className="flex">
         <div className="rounded-full h-[50px] w-[50px] bg-white text-slate-500 flex justify-center items-center">
           {user?.username.split("")[0].toUpperCase() || ""}
         </div>
-        {isExpandMoreProfileBlock ? (
-          <ExpandMoreIcon
-            className="cursor-pointer self-end"
-            style={{ color: "#fff" }}
-            onClick={() =>
-              setIsExpandMoreProfileBlock(!isExpandMoreProfileBlock)
-            }
-          />
-        ) : (
-          <ExpandLessIcon
-            className="cursor-pointer self-end"
-            style={{ color: "#fff" }}
-            onClick={() =>
-              setIsExpandMoreProfileBlock(!isExpandMoreProfileBlock)
-            }
-          />
-        )}
       </div>
       {isExpandMoreProfileBlock && (
-        <div className="absolute top-[80px] right-[30px] bg-slate-100 rounded-lg w-[150px] px-6 py-6 shadow-sm">
+        <div className="profile-container absolute top-[80px] right-[30px] bg-slate-100 rounded-lg w-[150px] px-6 py-6 shadow-sm">
           <div className="cursor-pointer">Profile</div>
           <div
-            className="cursor-pointer"
             onClick={() => {
               dispatch(authLogoutAction());
             }}

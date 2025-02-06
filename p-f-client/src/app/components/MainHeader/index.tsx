@@ -2,19 +2,19 @@
 import React from "react";
 
 import Link from "next/link";
-
 import { Button } from "@/components/ui/Button";
-
 import { useSelector } from "react-redux";
 import { RootStoreType } from "@/store/store";
-import { IUser } from "@/types/user";
 import Header from "../Header";
 import Profile from "../Profile";
+import { useGetTokenFromStorage } from "@/app/hooks/useGetTokenFromStorage";
 
 const MainHeader = () => {
   const isAuth = useSelector<RootStoreType>(
     (store) => store.authReducer.isAuth
   );
+
+  useGetTokenFromStorage();
 
   return (
     <>
@@ -28,8 +28,8 @@ const MainHeader = () => {
                 Login
               </Button>
             </Link>
-            <Link href={"auth/register"}>
-              <Button className="text-white hover:text-dimgrey" variant="outline">Register</Button>
+            <Link href={"auth/signup"}>
+              <Button className="text-white hover:text-dimgrey" variant="outline">Sign Up</Button>
             </Link>
           </div>
         )}

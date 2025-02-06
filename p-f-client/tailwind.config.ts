@@ -21,7 +21,8 @@ const config: Config = {
   		},
   		colors: {
 			primary: {
-				DEFAULT: "#1D4ED8", // Default shade of primary
+				// DEFAULT: "#1D4ED8", // Default
+				DEFAULT: "#23c686", // Default color for The Crew meet project shade of primary
 				light: "#93C5FD",   // Lighter shade
 				dark: "#1E40AF",    // Darker shade
 			  },
@@ -77,6 +78,7 @@ const config: Config = {
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
   			border: 'hsl(var(--border))',
+  			// input: '#C0C0C0',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			chart: {

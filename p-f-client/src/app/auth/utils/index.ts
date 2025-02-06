@@ -45,7 +45,7 @@ response: ResponseType,
     dispatch(setUserAction(response.data.user));
     
     localStorage.setItem("token", JSON.stringify(response.data.token));
-    router.push("/");
+    router.replace("/");
   }
 
   if (response.error && "data" in response.error) {
